@@ -2,7 +2,7 @@ import axios from 'axios';
 import hindijokes from './hindijokes';
 import lettercomp from './lettercomp';
 
-const handleCommand = async (command, speak) => {
+const handleCommand = async (command, speak,openletterModal) => {
     const lowerCaseCommand = command.toLowerCase();
     console.log("Received command:", command);
 
@@ -44,15 +44,7 @@ const handleCommand = async (command, speak) => {
                 speak('Sorry, I don’t have any Hindi jokes at the moment.');
             }
         
-        } else if (lowerCaseCommand.includes("write a leave application")) {
-            speak("Please provide your details for the leave application.");
-            await lettercomp("leave", speak);
-        
-        } else if (lowerCaseCommand.includes("write a job application")) {
-            speak("Please provide your details for the job application.");
-            await lettercomp("job", speak);
-        
-        } else if (lowerCaseCommand.startsWith("open ")) {
+        }else if (lowerCaseCommand.startsWith("open ")) {
             const query = lowerCaseCommand.replace("open ", "").trim();
             let url;
 

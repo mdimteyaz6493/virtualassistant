@@ -6,10 +6,11 @@ export const AppContext = createContext();
 
 // Create a Context Provider Component
 export const AppProvider = ({ children }) => {
-  const [images, setImages] = useState([]);
+  const [openModal, setopenModal] = useState(false);
+  const [openMenu, setopenMenu] = useState(false)
 
   return (
-    <AppContext.Provider value={{images,setImages}}>
+    <AppContext.Provider value={{openModal,setopenModal,openMenu,setopenMenu}}>
       {children}
     </AppContext.Provider>
   );

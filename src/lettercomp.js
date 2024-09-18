@@ -2,7 +2,7 @@ import { jobApplicationTemplate, leaveApplicationTemplate } from './letterformat
 
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-const lettercomp = async (type, speak,setisletter) => {
+const lettercomp = async (type, speak,setletter) => {
     try {
         let userInputs = {};
 
@@ -29,6 +29,7 @@ const lettercomp = async (type, speak,setisletter) => {
             );
             
             speak('Here is your leave application.');
+            setletter(leaveLetter)
             console.log(leaveLetter);
             speak(leaveLetter); // Store the generated letter in state
             
@@ -46,6 +47,7 @@ const lettercomp = async (type, speak,setisletter) => {
             );
             
             speak('Here is your job application.');
+            setletter(jobLetter)
             console.log(jobLetter);
             speak(jobLetter); // Store the generated letter in state
             

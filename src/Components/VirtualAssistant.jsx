@@ -1,7 +1,11 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useContext } from "react";
 import handleCommand from "../handleCommand"; // Import the handleCommand function
 import { IoSendSharp } from "react-icons/io5";
 import { FaMicrophone } from "react-icons/fa";
+import Letter from "./Letter";
+import { AppContext } from "../Context/AppContext";
+import { TbMenuDeep } from "react-icons/tb";
+
 
 const VirtualAssistant = () => {
   const [chatHistory, setChatHistory] = useState([]);
@@ -10,6 +14,8 @@ const VirtualAssistant = () => {
   const [isAssistantTyping, setIsAssistantTyping] = useState(false);
   const [isUserSpeaking, setIsUserSpeaking] = useState(false);
   const [isUserTyping, setIsUserTyping] = useState(false);
+  const [letter, setletter] = useState("")
+  const {openModal, setopenModal ,openMenu,setopenMenu} = useContext(AppContext);
 
   const chatBoxRef = useRef(null);
   const latestMessageRef = useRef(null);
@@ -49,15 +55,34 @@ const VirtualAssistant = () => {
   }, [chatHistory]);
 
   const startListening = () => {
-
     if (window.speechSynthesis) {
       window.speechSynthesis.cancel();
     }
-
+  
     if (recognition) {
       recognition.start();
+      recognition.onstart = () => {
+        console.log("Voice recognition started");
+        setIsUserSpeaking(true);
+      };
+  
+      recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        console.log("Transcript received:", transcript);
+        setIsUserSpeaking(false);
+        updateChatHistory(transcript, "user");
+        handleAssistantResponse(transcript);
+      };
+  
+      recognition.onerror = (event) => {
+        console.error("Speech recognition error:", event.error);
+        setIsUserSpeaking(false);
+      };
+    } else {
+      console.error("Speech recognition not supported in this browser.");
     }
   };
+  
 
   useEffect(() => {
     if (recognition) {
@@ -114,20 +139,28 @@ const VirtualAssistant = () => {
       setIsAssistantTyping(false);
       updateChatHistory(response, "assistant");
     }, (newPics) => {
-      setpics(newPics); // Update images in state
-      localStorage.setItem('imageUrls', JSON.stringify(newPics)); // Save to localStorage
-    });
+    },openletterModal);
   };
 
- 
-  return (
-    <div className="container">
-      <h1>Virtual Assistant</h1>
+  const openletterModal =()=>{
+    setopenlmodal(true)
+  }
 
+  const handlemenuButton = ()=>{
+    setopenMenu(!openMenu)
+  }
+
+  return (
+   <>
+
+  
+      {openModal ? <Letter/>:<>
+         <div className="container">
+         <button className="menu_button" onClick={handlemenuButton}><TbMenuDeep /></button>
       <div ref={chatBoxRef} className="chatBox">
         {chatHistory.length === 0 && (
-          <div style={styles.welcomeMessage}>
-            <p>Welcome! How can I assist you today?</p>
+          <div className="welcome">
+          <img src="images/welcome.png" alt="" />
           </div>
         )}
 
@@ -146,7 +179,7 @@ const VirtualAssistant = () => {
             )}
           </div>
         ))}
-
+        {letter && <pre>letter {letter}</pre>}
         {isAssistantTyping && (
           <div style={styles.chatMessage2}>
             <p style={styles.assistant}>Assistant is typing...</p>
@@ -163,7 +196,7 @@ const VirtualAssistant = () => {
           </div>
         )}
       </div>
-
+      
       <form className="inputForm" onSubmit={handleTextSubmit}>
         <input
           type="text"
@@ -172,15 +205,20 @@ const VirtualAssistant = () => {
           value={inputText}
           onChange={handleTextChange}
         />
-        <button type="submit">
-          <IoSendSharp className="send"/>
-        </button>
-
         <div className="mic">
           <FaMicrophone className="micro" onClick={startListening} />
         </div>
+        <div className="send_div">
+        <button type="submit">
+          <IoSendSharp className="send"/>
+        </button>
+        </div>
+
       </form>
+    
     </div>
+      </>}
+      </>
   );
 };
 
@@ -188,29 +226,18 @@ const styles = {
   chatMessage: {
     display: "flex",
     justifyContent: "flex-end",
-    marginBottom: "10px",
+    marginBottom: "30px",
   },
   chatMessage2: {
     display: "flex",
     justifyContent: "flex-start",
-    marginBottom: "10px",
+    marginBottom: "30px",
   },
   user: {
-    backgroundColor: "#d1e7ff",
+    backgroundColor: "purple",
     padding: "10px",
     borderRadius: "10px",
     maxWidth: "80%",
-  },
-  assistant: {
-    backgroundColor: "#f1f1f1",
-    padding: "10px",
-    borderRadius: "10px",
-    maxWidth: "80%",
-  },
-  inputField: {
-    width: "80%",
-    padding: "10px",
-    borderRadius: "5px",
   },
   imageGallery: {
     display: "flex",
@@ -224,18 +251,6 @@ const styles = {
     objectFit: "cover",
     cursor: "pointer",
     borderRadius: "10px",
-  },
-  welcomeMessage: {
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    height: "20%",
-    padding: "20px",
-    backgroundColor: "#f9f9f9",
-    borderRadius: "10px",
-    textAlign: "center",
-    fontSize: "16px",
-    color: "#333",
   },
 };
 
