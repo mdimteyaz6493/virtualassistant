@@ -6,8 +6,6 @@ const App = () => {
   return (
     <>
      <VirtualAssistant/>
-     <span>The web app is in production
-     </span>
     </>
   )
 }

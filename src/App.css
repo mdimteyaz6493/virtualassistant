@@ -2,38 +2,150 @@
     border: none;
     margin: none;
     box-sizing: border-box;
+    font-family: sans-serif;
 }
 .container {
-    text-align: center;
+    text-align: start;
     padding: 20px;
-    max-width: 600px;
+    width: 50vw;
+    height: 100vh;
     margin: 0 auto;
 }
 
 .chatBox {
-    height: 400px;
-    overflow-y: scroll;
-    border: 1px solid #ccc;
+    height: auto;
     border-radius: 10px;
     padding: 10px;
-    margin-bottom: 20px;
+    margin-bottom: 500px;
+    position: relative;
+    padding-bottom: 100px;
 }
+.assistant {
+    padding: 10px;
+    border-radius: 10px;
+    max-width: 100%;
+    line-height: 25px;
+    word-spacing: 2px;
+    font-size: 1.09rem;
+  }
+  
+
+.inputForm {
+    display: flex;
+    justify-content: space-between;
+    position: fixed;
+    bottom: 20px;
+    margin: 0 auto;
+    width: 50vw;
+    background-color: rgb(235, 232, 232);
+    gap: 20px;
+    height: 60px;
+    padding: 0px 8px;
+    border-radius: 50px;
+    overflow: hidden;
+    align-items: center;
+  }
+  
+  input{
+    flex: 1;
+    padding: 10px;
+    margin-right: 10px;
+    font-size: 16px;
+    border: none;
+    outline: none;
+    background-color: rgb(235, 232, 232);
+  }
+  
+  .send{
+   height: 100%;
+   font-size: 1.6rem;
+   color: rgb(95, 95, 95);
+   cursor: pointer;
+  }
+  .mic{
+    height: 50px;
+    width: 50px;
+    font-size: 1.2rem;
+    color: rgb(95, 95, 95);
+    cursor: pointer;
+    background-color: white;
+    padding: 5px 5px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    z-index: 2;
+   }
+   .mic .micro{
+    z-index: 1;
+   }
+  
+  .send:hover{
+    color: rgb(57, 57, 57);
+   }
+   button{
+    background-color: transparent;
+    outline: none;
+   }
+  
 
 @media only screen and (max-width: 600px) {
+
     .container {
-        text-align: center;
+        text-align: start;
         padding: 20px;
-        width:100%;
-        margin: 0;
+        width: 100vw;
         height: 100vh;
+        margin: 0 auto;
     }
     
     .chatBox {
-        height: 60%;
-        overflow-y: scroll;
-        border: 1px solid #ccc;
+        height: auto;
         border-radius: 10px;
         padding: 10px;
-        margin-bottom: 20px;
+        margin-bottom: 100px;
+        position: relative;
+        padding-bottom: 80px;
     }
+    
+    .inputForm {
+        margin: 0 auto;
+        width: 90vw;
+      }
+      
+      input{
+        flex: 1;
+        padding: 10px;
+        margin-right: 10px;
+        font-size: 16px;
+        border: none;
+        outline: none;
+        background-color: rgb(235, 232, 232);
+      }
+      
+      .send{
+       height: 100%;
+       font-size: 1.6rem;
+       color: rgb(95, 95, 95);
+       cursor: pointer;
+      }
+      .mic{
+        height: 50px;
+        width: 50px;
+        font-size: 1.2rem;
+        color: rgb(95, 95, 95);
+        cursor: pointer;
+        background-color: white;
+        padding: 5px 5px;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        
+       }
+      .send:hover{
+        color: rgb(57, 57, 57);
+       }
+       
 }

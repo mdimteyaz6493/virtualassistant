@@ -1,0 +1,27 @@
+else if (lowerCaseCommand.startsWith("image of ")) {
+            const query = lowerCaseCommand.replace("image of ", "").trim();
+
+            if (query) {
+                speak(`Searching for images of ${query}.`);
+                const apiKey = 'c7OKNdiPBZp7A0NWDYtCNySGpBdpUKTmG3Grgb32gY8'; 
+                const url = `https://api.unsplash.com/search/photos?query=${encodeURIComponent(query)}&client_id=${apiKey}&per_page=4`; // Request 4 images
+
+                try {
+                    const response = await axios.get(url);
+                    const picUrls = response.data.results.map(image => image.urls.small);
+                    console.log(picUrls) // Extract URLs of the images
+
+                    if (picUrls.length > 0) {
+                        localStorage.setItem('imageUrls', JSON.stringify(picUrls));
+                    } else {
+                        speak("Sorry, I couldn't find any images for that query.");
+                    }
+                } catch (error) {
+                    speak("An error occurred while fetching images.");
+                    console.error("Error fetching Unsplash images:", error);
+                }
+            } else {
+                speak("Please specify what you want to search for.");
+            }
+
+        }

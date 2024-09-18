@@ -1,74 +1,90 @@
 import React, { useState, useEffect, useRef } from "react";
 import handleCommand from "../handleCommand"; // Import the handleCommand function
+import { IoSendSharp } from "react-icons/io5";
+import { FaMicrophone } from "react-icons/fa";
 
 const VirtualAssistant = () => {
-  const [chatHistory, setChatHistory] = useState([]); // Store chat history
-  const [inputText, setInputText] = useState(""); // Text input from the user
+  const [chatHistory, setChatHistory] = useState([]);
+  const [inputText, setInputText] = useState("");
   const [defaultVoice, setDefaultVoice] = useState(null);
-  const [isAssistantTyping, setIsAssistantTyping] = useState(false); // Typing indicator for assistant
-  const [isUserTyping, setIsUserTyping] = useState(false); // Typing indicator for user
-  const [imageUrls, setImageUrls] = useState([]); // State for storing image URLs
+  const [isAssistantTyping, setIsAssistantTyping] = useState(false);
+  const [isUserSpeaking, setIsUserSpeaking] = useState(false);
+  const [isUserTyping, setIsUserTyping] = useState(false);
 
-  // Ref for the chat box
   const chatBoxRef = useRef(null);
+  const latestMessageRef = useRef(null);
 
-  // Initialize speech recognition
-  const SpeechRecognition =
-    window.SpeechRecognition || window.webkitSpeechRecognition;
-  const recognition = new SpeechRecognition();
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const recognition = SpeechRecognition ? new SpeechRecognition() : null;
 
   useEffect(() => {
-    // Fetch the list of available voices and set Microsoft Ravi as the default voice
-    const fetchVoices = () => {
-      const voices = window.speechSynthesis.getVoices();
-      const microsoftRaviVoice = voices.find((voice) =>
-        voice.name.includes("Microsoft Ravi")
-      );
+    if (window.speechSynthesis) {
+      const fetchVoices = () => {
+        const voices = window.speechSynthesis.getVoices();
+        const microsoftRaviVoice = voices.find((voice) => voice.name.includes("Microsoft Ravi"));
 
-      if (microsoftRaviVoice) {
-        setDefaultVoice(microsoftRaviVoice); // Set Ravi as the default voice
+        if (microsoftRaviVoice) {
+          setDefaultVoice(microsoftRaviVoice);
+        }
+      };
+
+      if (window.speechSynthesis.getVoices().length > 0) {
+        fetchVoices();
+      } else {
+        window.speechSynthesis.onvoiceschanged = fetchVoices;
       }
-    };
-
-    if (window.speechSynthesis.getVoices().length > 0) {
-      fetchVoices();
-    } else {
-      window.speechSynthesis.onvoiceschanged = fetchVoices;
     }
   }, []);
 
   useEffect(() => {
-    // Scroll to the bottom of the chat box whenever chatHistory changes
-    if (chatBoxRef.current) {
-      chatBoxRef.current.scrollTop = chatBoxRef.current.scrollHeight;
+    if (chatBoxRef.current && latestMessageRef.current) {
+      latestMessageRef.current.scrollIntoView({ behavior: "smooth" });
     }
+
+    return () => {
+      if (recognition) {
+        recognition.stop();
+      }
+    };
   }, [chatHistory]);
 
   const startListening = () => {
-    setImageUrls([]);
-    recognition.start();
-  };
 
-  recognition.onstart = () => {
-    console.log("Voice recognition started");
-  };
-
-  recognition.onresult = (event) => {
-    const transcript = event.results[0][0].transcript;
-    updateChatHistory(transcript, "user"); // Display user command first
-    handleAssistantResponse(transcript); // Process the command and get assistant's response
-  };
-
-  // Handle Text-to-Speech with Microsoft Ravi as the default voice
-  const speak = (text) => {
-    const utterance = new SpeechSynthesisUtterance(text);
-    if (defaultVoice) {
-      utterance.voice = defaultVoice; // Set Microsoft Ravi as the voice
+    if (window.speechSynthesis) {
+      window.speechSynthesis.cancel();
     }
-    window.speechSynthesis.speak(utterance);
+
+    if (recognition) {
+      recognition.start();
+    }
   };
 
-  // Update chat history with user or assistant messages
+  useEffect(() => {
+    if (recognition) {
+      recognition.onstart = () => {
+        console.log("Voice recognition started");
+        setIsUserSpeaking(true);
+      };
+
+      recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        setIsUserSpeaking(false);
+        updateChatHistory(transcript, "user");
+        handleAssistantResponse(transcript);
+      };
+    }
+  }, [recognition]);
+
+  const speak = (text) => {
+    if (window.speechSynthesis) {
+      const utterance = new SpeechSynthesisUtterance(text);
+      if (defaultVoice) {
+        utterance.voice = defaultVoice;
+      }
+      window.speechSynthesis.speak(utterance);
+    }
+  };
+
   const updateChatHistory = (message, sender) => {
     setChatHistory((prevChatHistory) => [
       ...prevChatHistory,
@@ -76,44 +92,45 @@ const VirtualAssistant = () => {
     ]);
   };
 
-  // Handle user text input
   const handleTextChange = (e) => {
     setInputText(e.target.value);
-    setIsUserTyping(true); // Show "typing" indicator for user
+    setIsUserTyping(true);
   };
 
   const handleTextSubmit = (e) => {
     e.preventDefault();
     if (inputText.trim()) {
-      setIsUserTyping(false); // Hide "typing" indicator for user
-      updateChatHistory(inputText, "user"); // Display user command first
-      handleAssistantResponse(inputText); // Process the command and get assistant's response
-      setInputText(""); // Clear the input field
+      setIsUserTyping(false);
+      updateChatHistory(inputText, "user");
+      handleAssistantResponse(inputText);
+      setInputText("");
     }
   };
 
-  // Handle the assistant's response, show "typing" before responding
   const handleAssistantResponse = (command) => {
-    setIsAssistantTyping(true); // Show "typing" indicator for assistant
-    handleCommand(command, (response) => {
-      // After receiving the assistant's response
+    setIsAssistantTyping(true);
+    handleCommand(command,(response) => {
       speak(response);
-      setIsAssistantTyping(false); // Remove "typing" indicator
-      updateChatHistory(response, "assistant"); // Display assistant's response
-    }, null, setImageUrls); // Pass setImageUrls to handleCommand
+      setIsAssistantTyping(false);
+      updateChatHistory(response, "assistant");
+    }, (newPics) => {
+      setpics(newPics); // Update images in state
+      localStorage.setItem('imageUrls', JSON.stringify(newPics)); // Save to localStorage
+    });
   };
 
-  // Open image in a new tab
-  const openImage = (url) => {
-    window.open(url, "_blank");
-  };
-
+ 
   return (
     <div className="container">
       <h1>Virtual Assistant</h1>
 
       <div ref={chatBoxRef} className="chatBox">
-        {/* Display chat history */}
+        {chatHistory.length === 0 && (
+          <div style={styles.welcomeMessage}>
+            <p>Welcome! How can I assist you today?</p>
+          </div>
+        )}
+
         {chatHistory.map((chat, index) => (
           <div
             key={index}
@@ -122,42 +139,32 @@ const VirtualAssistant = () => {
               justifyContent: chat.sender === "user" ? "flex-end" : "flex-start",
             }}
           >
-            <p style={styles[chat.sender]}>{chat.message}</p>
+            {chat.sender === "assistant" ? (
+              <p className="assistant" ref={index === chatHistory.length - 1 ? latestMessageRef : null}>{chat.message}</p>
+            ) : (
+              <p style={styles[chat.sender]} ref={index === chatHistory.length - 1 ? latestMessageRef : null}>{chat.message}</p>
+            )}
           </div>
         ))}
 
-        {/* Display images */}
-        {imageUrls.length > 0 && (
-          <div style={styles.imageGallery}>
-            {imageUrls.map((url, index) => (
-              <img
-                key={index}
-                src={url}
-                alt={`Search Result ${index + 1}`}
-                style={styles.image}
-                onClick={() => openImage(url)}
-              />
-            ))}
-          </div>
-        )}
-
-        {/* Show "Assistant is typing" message when processing */}
         {isAssistantTyping && (
           <div style={styles.chatMessage2}>
             <p style={styles.assistant}>Assistant is typing...</p>
           </div>
         )}
-
-        {/* Show "User is typing" message when user is typing */}
         {isUserTyping && (
           <div style={styles.chatMessage}>
             <p style={styles.user}>You are typing...</p>
           </div>
         )}
+        {isUserSpeaking && (
+          <div style={styles.chatMessage}>
+            <p style={styles.user}>You are speaking...</p>
+          </div>
+        )}
       </div>
 
-      {/* Text input for typing */}
-      <form style={styles.inputForm} onSubmit={handleTextSubmit}>
+      <form className="inputForm" onSubmit={handleTextSubmit}>
         <input
           type="text"
           style={styles.inputField}
@@ -165,29 +172,27 @@ const VirtualAssistant = () => {
           value={inputText}
           onChange={handleTextChange}
         />
-        <button style={styles.button} type="submit">
-          Send
+        <button type="submit">
+          <IoSendSharp className="send"/>
         </button>
-      </form>
 
-      {/* Button for voice input */}
-      <button style={styles.button} onClick={startListening}>
-        Start Voice Command
-      </button>
+        <div className="mic">
+          <FaMicrophone className="micro" onClick={startListening} />
+        </div>
+      </form>
     </div>
   );
 };
 
 const styles = {
-  
   chatMessage: {
     display: "flex",
-    justifyContent:"flex-end",
+    justifyContent: "flex-end",
     marginBottom: "10px",
   },
   chatMessage2: {
     display: "flex",
-    justifyContent:"flex-start",
+    justifyContent: "flex-start",
     marginBottom: "10px",
   },
   user: {
@@ -197,32 +202,15 @@ const styles = {
     maxWidth: "80%",
   },
   assistant: {
-    backgroundColor: "#f0f0f0",
+    backgroundColor: "#f1f1f1",
     padding: "10px",
     borderRadius: "10px",
     maxWidth: "80%",
   },
-  inputForm: {
-    display: "flex",
-    justifyContent: "space-between",
-    marginBottom: "20px",
-  },
   inputField: {
-    flex: 1,
+    width: "80%",
     padding: "10px",
-    borderRadius: "10px",
-    border: "1px solid #ccc",
-    marginRight: "10px",
-    fontSize: "16px",
-  },
-  button: {
-    padding: "10px 20px",
-    fontSize: "16px",
-    cursor: "pointer",
-    borderRadius: "10px",
-    backgroundColor: "#007bff",
-    color: "white",
-    border: "none",
+    borderRadius: "5px",
   },
   imageGallery: {
     display: "flex",
@@ -236,6 +224,18 @@ const styles = {
     objectFit: "cover",
     cursor: "pointer",
     borderRadius: "10px",
+  },
+  welcomeMessage: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    height: "20%",
+    padding: "20px",
+    backgroundColor: "#f9f9f9",
+    borderRadius: "10px",
+    textAlign: "center",
+    fontSize: "16px",
+    color: "#333",
   },
 };
 

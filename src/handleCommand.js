@@ -1,23 +1,26 @@
 import axios from 'axios';
 import hindijokes from './hindijokes';
+import lettercomp from './lettercomp';
 
-const handleCommand = async (command, speak, setMessage, setImageUrls) => {
+const handleCommand = async (command, speak) => {
     const lowerCaseCommand = command.toLowerCase();
     console.log("Received command:", command);
 
     try {
         // Simulate a delay before processing the command
-        await new Promise(resolve => setTimeout(resolve, 3000)); // 3 seconds delay
+        await new Promise(resolve => setTimeout(resolve, 2000)); // 3 seconds delay
 
-        if (lowerCaseCommand.includes("hello jarvis")) {
+        if (lowerCaseCommand.includes("hello")) {
             speak("Hello, how can I assist you today?");
-            console.log("Processed 'hello jarvis' command.");
         
         } else if (lowerCaseCommand.includes("your name")) {
             speak("My name is Jarvis");
         
+        } else if (lowerCaseCommand.includes("who are you")) {
+            speak("I am a virtual assistant.");
+        
         } else if (lowerCaseCommand.includes("developer")) {
-            speak("I am developed by Md Imteyaz Alam on 17th September 2024");
+            speak("I was developed by Md Imteyaz Alam on 17th September 2024");
         
         } else if (lowerCaseCommand.includes('english joke') || lowerCaseCommand.includes('english jokes')) {
             const language = 'en';
@@ -31,8 +34,7 @@ const handleCommand = async (command, speak, setMessage, setImageUrls) => {
                 console.error('Error fetching joke:', error);
             }
 
-        }
-        else if (lowerCaseCommand.includes('hindi joke') || lowerCaseCommand.includes('hindi jokes')) {
+        } else if (lowerCaseCommand.includes('hindi joke') || lowerCaseCommand.includes('hindi jokes')) {
             if (hindijokes.length > 0) {
                 const randomIndex = Math.floor(Math.random() * hindijokes.length);
                 const joke = hindijokes[randomIndex].joke; // Accessing the joke property
@@ -42,9 +44,13 @@ const handleCommand = async (command, speak, setMessage, setImageUrls) => {
                 speak('Sorry, I don’t have any Hindi jokes at the moment.');
             }
         
-        } 
-             else if (lowerCaseCommand.match(/(nice|very good|awesome|funny|good|amazing)/)) {
-            speak("Thanks, I always try to give my best.");
+        } else if (lowerCaseCommand.includes("write a leave application")) {
+            speak("Please provide your details for the leave application.");
+            await lettercomp("leave", speak);
+        
+        } else if (lowerCaseCommand.includes("write a job application")) {
+            speak("Please provide your details for the job application.");
+            await lettercomp("job", speak);
         
         } else if (lowerCaseCommand.startsWith("open ")) {
             const query = lowerCaseCommand.replace("open ", "").trim();
@@ -77,12 +83,11 @@ const handleCommand = async (command, speak, setMessage, setImageUrls) => {
             window.open(url, "_blank");
             console.log(`Processed 'open' command with URL: ${url}`);
 
-        } else if (lowerCaseCommand.match(/(what is|who is|where|why|can you tell|you know about|about)/)) {
-            const query = lowerCaseCommand.replace(/(what is|who is|where|why|can you tell|you know about|about)/, "").trim();
+        } else if (lowerCaseCommand.match(/(what is|who is|where|why|can you tell|you know about|about|how)/)) {
+            const query = lowerCaseCommand.replace(/(what is|who is|where|why|can you tell|you know about|about|how)/, "").trim();
             console.log("Query for Wikipedia:", query);
 
             if (query) {
-                speak(`Searching for information about ${query}.`);
                 const url = `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(query)}`;
 
                 try {
@@ -103,32 +108,7 @@ const handleCommand = async (command, speak, setMessage, setImageUrls) => {
                 speak("Please specify what you want to search for.");
             }
 
-        } else if (lowerCaseCommand.startsWith("image of ")) {
-            const query = lowerCaseCommand.replace("image of ", "").trim();
-
-            if (query) {
-                speak(`Searching for images of ${query}.`);
-                const apiKey = 'c7OKNdiPBZp7A0NWDYtCNySGpBdpUKTmG3Grgb32gY8'; // Replace with your Unsplash API key
-                const url = `https://api.unsplash.com/search/photos?query=${encodeURIComponent(query)}&client_id=${apiKey}&per_page=4`; // Request 4 images
-
-                try {
-                    const response = await axios.get(url);
-                    const imageUrls = response.data.results.map(image => image.urls.small); // Extract URLs of the images
-
-                    if (imageUrls.length > 0) {
-                        setImageUrls(imageUrls); // Set the array of image URLs for displaying
-                    } else {
-                        speak("Sorry, I couldn't find any images for that query.");
-                    }
-                } catch (error) {
-                    speak("An error occurred while fetching images.");
-                    console.error("Error fetching Unsplash images:", error);
-                }
-            } else {
-                speak("Please specify what you want to search for.");
-            }
-
-        } else if (lowerCaseCommand.startsWith("play video ")) {
+        }  else if (lowerCaseCommand.startsWith("play video ")) {
             const query = lowerCaseCommand.replace("play video ", "").trim();
             if (query) {
                 const url = `https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`;
