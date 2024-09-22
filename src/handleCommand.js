@@ -1,14 +1,14 @@
 import axios from 'axios';
 import hindijokes from './hindijokes';
-import lettercomp from './lettercomp';
+import lyricsCollection from './lyrics';
 
-const handleCommand = async (command, speak,openletterModal) => {
+const handleCommand = async (command, speak, openletterModal) => {
     const lowerCaseCommand = command.toLowerCase();
     console.log("Received command:", command);
 
     try {
         // Simulate a delay before processing the command
-        await new Promise(resolve => setTimeout(resolve, 2000)); // 3 seconds delay
+        await new Promise(resolve => setTimeout(resolve, 2000)); // 2 seconds delay
 
         if (lowerCaseCommand.includes("hello")) {
             speak("Hello, how can I assist you today?");
@@ -22,7 +22,38 @@ const handleCommand = async (command, speak,openletterModal) => {
         } else if (lowerCaseCommand.includes("developer")) {
             speak("I was developed by Md Imteyaz Alam on 17th September 2024");
         
-        } else if (lowerCaseCommand.includes('english joke') || lowerCaseCommand.includes('english jokes')) {
+        } else if (lowerCaseCommand.match(/(nice|awesome|good|very good|op|amazing|wow|omg)/)) {
+            speak("Thanks, I always try to give my best.");
+
+        } else if (lowerCaseCommand.includes('poem') || lowerCaseCommand.includes('sing a poem')) {
+            // Randomly select a poem from the lyrics collection
+            const randomIndex = Math.floor(Math.random() * lyricsCollection.length);
+            const selectedPoem = lyricsCollection[randomIndex];
+    
+            speak(`Singing ${selectedPoem.title}.`);
+    
+            // Function to simulate singing by adjusting pitch and rate
+            const singLine = (line, index) => {
+                const utterance = new SpeechSynthesisUtterance(line);
+    
+                // Adjust pitch and rate for a musical effect
+                 utterance.pitch = 1.2;  // Higher pitch to simulate singing
+                 utterance.rate = 1;      // Adjust the speed for better effect
+                 utterance.volume = 1;
+                utterance.voice = window.speechSynthesis.getVoices()[0];
+    
+                // Speak the line with a slight delay for rhythm
+                setTimeout(() => {
+                    window.speechSynthesis.speak(utterance);
+                }, index * 2000); // Adjust timing for each line
+            };
+    
+            // Speak each line with a delay to simulate singing in tune
+            selectedPoem.lines.forEach((line, index) => singLine(line, index));
+    
+            console.log("Singing the poem:", selectedPoem.title, selectedPoem.lines);
+        }
+        else if (lowerCaseCommand.includes('english joke') || lowerCaseCommand.includes('english jokes')) {
             const language = 'en';
             try {
                 const response = await axios.get(`https://v2.jokeapi.dev/joke/Any?lang=${language}`);
@@ -37,14 +68,14 @@ const handleCommand = async (command, speak,openletterModal) => {
         } else if (lowerCaseCommand.includes('hindi joke') || lowerCaseCommand.includes('hindi jokes')) {
             if (hindijokes.length > 0) {
                 const randomIndex = Math.floor(Math.random() * hindijokes.length);
-                const joke = hindijokes[randomIndex].joke; // Accessing the joke property
+                const joke = hindijokes[randomIndex].joke;
                 speak(joke);
                 console.log(`Hindi Joke: ${joke}`);
             } else {
                 speak('Sorry, I don’t have any Hindi jokes at the moment.');
             }
-        
-        }else if (lowerCaseCommand.startsWith("open ")) {
+
+        } else if (lowerCaseCommand.startsWith("open ")) {
             const query = lowerCaseCommand.replace("open ", "").trim();
             let url;
 
@@ -100,7 +131,7 @@ const handleCommand = async (command, speak,openletterModal) => {
                 speak("Please specify what you want to search for.");
             }
 
-        }  else if (lowerCaseCommand.startsWith("play video ")) {
+        } else if (lowerCaseCommand.startsWith("play video ")) {
             const query = lowerCaseCommand.replace("play video ", "").trim();
             if (query) {
                 const url = `https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`;

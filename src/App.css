@@ -38,7 +38,6 @@ body{
     word-spacing: 2px;
     font-size: 1.09rem;
     background-color: #2d2828;
-    padding: 20px;
   }
   
 
@@ -123,12 +122,26 @@ body{
     justify-content: center;
     align-items: center;
     gap:0px;
+    opacity: 0.5;
    }
-   .welcome img{
-    height: 500px;
-    opacity: 0.1;
-   }
+  .welcome .logo_cont{
+    background-color: rgb(28, 28, 28);
+    height: 200px;
+    width: 200px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 5rem;
+    color: #2d2828;
+    box-shadow: inset 2px 2px 5px rgba(0,0,0,0.5);
+  }
 
+  .welcome span{
+    margin-top: 20px;
+    font-size: 1.5rem;
+    color:rgb(28, 28, 28);;
+  }
    .menu_button{
     background-color:#363636;
     height: 40px;
@@ -142,6 +155,24 @@ body{
     right: 10px;
     display: none;
    }
+
+   .image_button{
+    height: 50px;
+    width:50px;
+    position: absolute;
+    right: 50px;
+    bottom: 30px;
+    cursor: pointer;
+    background-color:#eceff1;
+    padding: 5px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .image_button img{
+    height: 85%;
+  }
 
 @media only screen and (max-width: 600px) {
 
@@ -190,7 +221,7 @@ body{
        
       }
       .assistant {
-        padding: 15px;
+        padding: 10px;
         border-radius: 10px;
         max-width: 100%;
         line-height: 25px;
@@ -198,11 +229,14 @@ body{
         font-size: 1rem;
       }
 
-      
-       .welcome img{
-        height: 300px;
-       }
-     
-       }
-    
+      .image_button{
+        height: 50px;
+        width:50px;
+        position: absolute;
+        right: 15px;
+        bottom: 120px;
+      }
+      .image_button img{
+        height: 85%;
+      }
 }

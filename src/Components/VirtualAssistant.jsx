@@ -2,10 +2,9 @@ import React, { useState, useEffect, useRef, useContext } from "react";
 import handleCommand from "../handleCommand"; // Import the handleCommand function
 import { IoSendSharp } from "react-icons/io5";
 import { FaMicrophone } from "react-icons/fa";
-import Letter from "./Letter";
 import { AppContext } from "../Context/AppContext";
 import { TbMenuDeep } from "react-icons/tb";
-
+import ImageBox from "./ImageBox";
 
 const VirtualAssistant = () => {
   const [chatHistory, setChatHistory] = useState([]);
@@ -14,20 +13,25 @@ const VirtualAssistant = () => {
   const [isAssistantTyping, setIsAssistantTyping] = useState(false);
   const [isUserSpeaking, setIsUserSpeaking] = useState(false);
   const [isUserTyping, setIsUserTyping] = useState(false);
-  const [letter, setletter] = useState("")
-  const {openModal, setopenModal ,openMenu,setopenMenu} = useContext(AppContext);
+  const [letter, setletter] = useState("");
+  const [openletter, setopenletter] = useState(false);
+  const { openModal, setopenModal, openMenu, setopenMenu } =
+    useContext(AppContext);
 
   const chatBoxRef = useRef(null);
   const latestMessageRef = useRef(null);
 
-  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const SpeechRecognition =
+    window.SpeechRecognition || window.webkitSpeechRecognition;
   const recognition = SpeechRecognition ? new SpeechRecognition() : null;
 
   useEffect(() => {
     if (window.speechSynthesis) {
       const fetchVoices = () => {
         const voices = window.speechSynthesis.getVoices();
-        const microsoftRaviVoice = voices.find((voice) => voice.name.includes("Microsoft Ravi"));
+        const microsoftRaviVoice = voices.find((voice) =>
+          voice.name.includes("Microsoft Ravi")
+        );
 
         if (microsoftRaviVoice) {
           setDefaultVoice(microsoftRaviVoice);
@@ -58,14 +62,14 @@ const VirtualAssistant = () => {
     if (window.speechSynthesis) {
       window.speechSynthesis.cancel();
     }
-  
+
     if (recognition) {
       recognition.start();
       recognition.onstart = () => {
         console.log("Voice recognition started");
         setIsUserSpeaking(true);
       };
-  
+
       recognition.onresult = (event) => {
         const transcript = event.results[0][0].transcript;
         console.log("Transcript received:", transcript);
@@ -73,7 +77,7 @@ const VirtualAssistant = () => {
         updateChatHistory(transcript, "user");
         handleAssistantResponse(transcript);
       };
-  
+
       recognition.onerror = (event) => {
         console.error("Speech recognition error:", event.error);
         setIsUserSpeaking(false);
@@ -82,7 +86,6 @@ const VirtualAssistant = () => {
       console.error("Speech recognition not supported in this browser.");
     }
   };
-  
 
   useEffect(() => {
     if (recognition) {
@@ -134,91 +137,115 @@ const VirtualAssistant = () => {
 
   const handleAssistantResponse = (command) => {
     setIsAssistantTyping(true);
-    handleCommand(command,(response) => {
-      speak(response);
-      setIsAssistantTyping(false);
-      updateChatHistory(response, "assistant");
-    }, (newPics) => {
-    },openletterModal);
+    handleCommand(
+      command,
+      (response) => {
+        speak(response);
+        setIsAssistantTyping(false);
+        updateChatHistory(response, "assistant");
+      },
+      (newPics) => {},
+      openletterModal
+    );
   };
 
-  const openletterModal =()=>{
-    setopenlmodal(true)
-  }
+  const openletterModal = () => {
+    setopenlmodal(true);
+  };
 
-  const handlemenuButton = ()=>{
-    setopenMenu(!openMenu)
-  }
+  const handlemenuButton = () => {
+    setopenMenu(!openMenu);
+  };
 
   return (
-   <>
-
-  
-      {openModal ? <Letter/>:<>
-         <div className="container">
-         <button className="menu_button" onClick={handlemenuButton}><TbMenuDeep /></button>
-      <div ref={chatBoxRef} className="chatBox">
-        {chatHistory.length === 0 && (
-          <div className="welcome">
-          <img src="images/welcome.png" alt="" />
-          </div>
-        )}
-
-        {chatHistory.map((chat, index) => (
-          <div
-            key={index}
-            style={{
-              ...styles.chatMessage,
-              justifyContent: chat.sender === "user" ? "flex-end" : "flex-start",
-            }}
-          >
-            {chat.sender === "assistant" ? (
-              <p className="assistant" ref={index === chatHistory.length - 1 ? latestMessageRef : null}>{chat.message}</p>
-            ) : (
-              <p style={styles[chat.sender]} ref={index === chatHistory.length - 1 ? latestMessageRef : null}>{chat.message}</p>
-            )}
-          </div>
-        ))}
-        {letter && <pre>letter {letter}</pre>}
-        {isAssistantTyping && (
-          <div style={styles.chatMessage2}>
-            <p style={styles.assistant}>Assistant is typing...</p>
-          </div>
-        )}
-        {isUserTyping && (
-          <div style={styles.chatMessage}>
-            <p style={styles.user}>You are typing...</p>
-          </div>
-        )}
-        {isUserSpeaking && (
-          <div style={styles.chatMessage}>
-            <p style={styles.user}>You are speaking...</p>
-          </div>
-        )}
-      </div>
-      
-      <form className="inputForm" onSubmit={handleTextSubmit}>
-        <input
-          type="text"
-          style={styles.inputField}
-          placeholder="Type your command..."
-          value={inputText}
-          onChange={handleTextChange}
-        />
-        <div className="mic">
-          <FaMicrophone className="micro" onClick={startListening} />
-        </div>
-        <div className="send_div">
-        <button type="submit">
-          <IoSendSharp className="send"/>
+    <>
+      <div className="container">
+        <button className="menu_button" onClick={handlemenuButton}>
+          <TbMenuDeep />
         </button>
+        <div ref={chatBoxRef} className="chatBox">
+          {chatHistory.length === 0 && (
+            <div className="welcome">
+              <div className="logo_cont">
+                <FaMicrophone className="logo" />
+              </div>
+            </div>
+          )}
+
+          {chatHistory.map((chat, index) => (
+            <div
+              key={index}
+              style={{
+                ...styles.chatMessage,
+                justifyContent:
+                  chat.sender === "user" ? "flex-end" : "flex-start",
+              }}
+            >
+              {chat.sender === "assistant" ? (
+                <p
+                  className="assistant"
+                  ref={
+                    index === chatHistory.length - 1 ? latestMessageRef : null
+                  }
+                >
+                  {chat.message}
+                </p>
+              ) : (
+                <p
+                  style={styles[chat.sender]}
+                  ref={
+                    index === chatHistory.length - 1 ? latestMessageRef : null
+                  }
+                >
+                  {chat.message}
+                </p>
+              )}
+            </div>
+          ))}
+          {letter && <pre>letter {letter}</pre>}
+          {isAssistantTyping && (
+            <div style={styles.chatMessage2}>
+              <div class="loading">
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
+            </div>
+          )}
+          {isUserTyping && (
+            <div style={styles.chatMessage}>
+              <p style={styles.user}>You are typing...</p>
+            </div>
+          )}
+          {isUserSpeaking && (
+            <div style={styles.chatMessage}>
+              <p style={styles.user}>You are speaking...</p>
+            </div>
+          )}
         </div>
 
-      </form>
-    
-    </div>
-      </>}
-      </>
+        <form className="inputForm" onSubmit={handleTextSubmit}>
+          <input
+            type="text"
+            style={styles.inputField}
+            placeholder="Type your command..."
+            value={inputText}
+            onChange={handleTextChange}
+          />
+          <div className="mic">
+            <FaMicrophone className="micro" onClick={startListening} />
+          </div>
+          <div className="send_div">
+            <button type="submit">
+              <IoSendSharp className="send" />
+            </button>
+          </div>
+        </form>
+      </div>
+      {openModal && <ImageBox/>}
+    </>
   );
 };
 

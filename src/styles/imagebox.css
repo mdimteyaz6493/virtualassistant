@@ -1,0 +1,117 @@
+.img_box{
+    height: 600px;
+    width: 50%;
+    background-color:rgb(22, 22, 22);
+    position: absolute;
+    bottom: 100px;
+    right: 19%;
+    position: fixed;
+    border-radius: 20px;
+    padding: 30px;
+    z-index: 987654321;
+}
+.img_box .img_box_close{
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #8b8b8b;
+}
+.img_box .search_form{
+    margin-top: 30px;
+}
+.img_box .search_form .input_area{
+    background-color: rgb(28, 28, 28);
+    height: 50px;
+    border-radius: 10px;
+    overflow: hidden;
+}
+.img_box .search_form .input_area input{
+    width: 90%;
+    background-color: rgb(28, 28, 28);
+    height: 100%;
+    padding-left: 20px;
+    color:#f1f1f1;
+}
+.img_box .search_form .input_area button{
+    color:#8b8b8b;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+.img_box .search_form .result_area{
+    margin-top: 20px;
+    border-radius: 10px;
+    height: 420px;
+    overflow-y: scroll;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 10px;
+    justify-content: center;
+    align-items: center;
+}
+.img_box .search_form .result_area img{
+    height: 200px;
+    width: 200px;
+    object-fit: cover;
+    border-radius: 10px;
+}
+
+/* width */
+::-webkit-scrollbar {
+    width: 10px;
+  }
+  
+  /* Track */
+  ::-webkit-scrollbar-track {
+    background: #000000;
+    border-radius: 10px;
+  }
+  
+  /* Handle */
+  ::-webkit-scrollbar-thumb {
+    background: rgb(28, 28, 28);
+    border-radius: 10px;
+  }
+  
+  /* Handle on hover */
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgb(98, 98, 98)28, 28, 28);
+  }
+@media only screen and (max-width: 600px) {
+    .img_box{
+        height: 100%;
+        width: 100%;
+        background-color:rgb(22, 22, 22);
+        position: absolute;
+        bottom: 0px;
+        left: 50%;
+        transform: translate(-50%);
+        border-radius: 10px;
+        padding: 15px;
+    }
+    .img_box .img_box_close{
+        position: absolute;
+        right: 10px;
+        top: 10px;
+        font-size: 1.5rem;
+    }
+
+    .img_box .search_form .input_area input{
+        width: 80%;
+    }
+    .img_box .search_form .result_area{
+        margin-top: 20px;
+        border-radius: 10px;
+        height: 600px;
+    }
+    .img_box .search_form .result_area img{
+        height: 150px;
+        width: 150px;
+    }
+    ::-webkit-scrollbar {
+        width: 0px;
+      }
+}
